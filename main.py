@@ -1,46 +1,34 @@
-from commands import parse_command, list_shapes, calculate_distance
+from commands import parse_command, list_shapes
 
 def geometric_calculator():
     shapes = {}
 
-    print("Geomteric Calculator")
-    print("For queries to create and calculate shapes type: help, to exit type:exit")
+    print("Geometric Calculator")
+    print("For queries to create and calculate shapes type: help, to exit type: exit")
 
     while True:
         try:
             command = input("> ").strip()
             if command.lower() == "exit":
-                print("Exit Success")
+                print("Exiting the calculator. Goodbye!")
                 break
-            if command.lower() == "help":
+            elif command.lower() == "help":
                 print("\nCommands:")
                 print("Define a Point: <name> = Point(x, y)")
                 print("Define a Line: <name> = Line(point1, point2)")
                 print("Define a Circle: <name> = Circle(center, radius)")
-                print("Define a Rectangle: <name> = Rectangle(bottom_left, top_right)")
+                print("Define a Rectangle: <name> = Rectangle(point1, point2, point3, point4)")
                 print("Query Distance: distance(shape1, shape2)")
+                print("Query Area of Circle/Rectangle: <shape>.area()")
+                print("Query Perimeter of Rectangle: <shape>.perimeter()")
+                print("Query Circumference of Circle: <shape>.circumference()")
+                print("Query Length of Line: <line>.length()")
                 print("List all defined shapes and points: list")
                 print("Type 'exit' to quit.\n")
-                continue
-
-            if command.lower() == "list":
-                print(list_shapes(shapes))
-                continue
-
-            if command.lower().startswith("distance"):
-                _, args = command.split("(", 1)
-                shape1_name, shape2_name = args.strip()[:-1].split(",")
-                shape1_name = shape1_name.strip()
-                shape2_name = shape2_name.strip()
-                print(calculate_distance(shape1_name, shape2_name, shapes))
-                continue
-
-            if "=" in command:
-                print(parse_command(command, shapes))
+            elif command.lower() == "list":
+                list_shapes(shapes)
             else:
-                result = eval(command, {}, shapes)
-                print(result)
-
+                parse_command(command, shapes)
         except Exception as e:
             print(f"Error: {e}. Type 'help' for guidance.")
 

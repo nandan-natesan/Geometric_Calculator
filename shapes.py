@@ -6,29 +6,23 @@ class Point:
         self.x = x
         self.y = y
 
-    def distance(self, other):
-        if not isinstance(other, Point):
-            raise ValueError("Distance can only be calculated between two Points.")
-        return math.hypot(self.x - other.x, self.y - other.y)
-
     def distance_to(self, other):
         if isinstance(other, Point):
-            return self.distance(other)
+            return math.hypot(self.x - other.x, self.y - other.y)
         elif isinstance(other, Circle):
-            return max(0, self.distance(other.center) - other.radius)
+            return max(0, self.distance_to(other.center) - other.radius)
         elif isinstance(other, Line):
             line_dist = abs((other.p2.y - other.p1.y) * self.x - (other.p2.x - other.p1.x) * self.y +
                             other.p2.x * other.p1.y - other.p2.y * other.p1.x) / other.length()
             return line_dist
         elif isinstance(other, Rectangle):
-            x_dist = max(0, other.bottom_left.x - self.x, self.x - other.top_right.x)
-            y_dist = max(0, other.bottom_left.y - self.y, self.y - other.top_right.y)
-            return math.hypot(x_dist, y_dist)
+            return other.distance_to(self)
         else:
             raise ValueError("Unsupported shape combination for distance calculation.")
 
     def __repr__(self):
         return f"{self.name}({self.x}, {self.y})"
+
 
 class Line:
     def __init__(self, name, p1, p2):
@@ -39,7 +33,28 @@ class Line:
         self.p2 = p2
 
     def length(self):
-        return self.p1.distance(self.p2)
+        return self.p1.distance_to(self.p2)
+
+    def distance_to(self, other):
+        if isinstance(other, Point):
+            return other.distance_to(self)
+        elif isinstance(other, Line):
+            if self.is_parallel_to(other):
+                return abs((other.p2.y - other.p1.y) * self.p1.x - (other.p2.x - other.p1.x) * self.p1.y +
+                           other.p2.x * other.p1.y - other.p2.y * other.p1.x) / other.length()
+            elif self._lines_intersect(other):
+                return 0
+            else:
+                return min(
+                    self.p1.distance_to(other), self.p2.distance_to(other),
+                    other.p1.distance_to(self), other.p2.distance_to(self)
+                )
+        elif isinstance(other, Circle):
+            return min(self.p1.distance_to(other), self.p2.distance_to(other))
+        elif isinstance(other, Rectangle):
+            return min(self.p1.distance_to(other), self.p2.distance_to(other))
+        else:
+            raise ValueError("Unsupported shape combination for distance calculation.")
 
     def is_parallel_to(self, other):
         dx1 = self.p2.x - self.p1.x
@@ -48,28 +63,15 @@ class Line:
         dy2 = other.p2.y - other.p1.y
         return dx1 * dy2 == dx2 * dy1
 
-    def distance_to(self, other):
-        if isinstance(other, Point):
-            return other.distance_to(self)
-        elif isinstance(other, Circle):
-            d1 = self.p1.distance_to(other)
-            d2 = self.p2.distance_to(other)
-            return min(d1, d2)
-        elif isinstance(other, Rectangle):
-            return min(self.p1.distance_to(other), self.p2.distance_to(other))
-        elif isinstance(other, Line):
-            if self.is_parallel_to(other):
-                return abs((other.p2.y - other.p1.y) * self.p1.x - (other.p2.x - other.p1.x) * self.p1.y +
-                           other.p2.x * other.p1.y - other.p2.y * other.p1.x) / other.length()
-            elif self.p1.distance_to(other.p1) == 0 and self.p2.distance_to(other.p2) == 0:
-                return 0  # Identical lines
-            else:
-                return 0  # Intersecting lines
-        else:
-            raise ValueError("Unsupported shape combination for distance calculation.")
+    def _lines_intersect(self, other):
+        def ccw(A, B, C):
+            return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x)
+        return (ccw(self.p1, self.p2, other.p1) != ccw(self.p1, self.p2, other.p2) and
+                ccw(other.p1, other.p2, self.p1) != ccw(other.p1, other.p2, self.p2))
 
     def __repr__(self):
         return f"{self.name}[{self.p1}, {self.p2}]"
+
 
 class Circle:
     def __init__(self, name, center, radius):
@@ -89,49 +91,59 @@ class Circle:
         if isinstance(other, Point):
             return other.distance_to(self)
         elif isinstance(other, Circle):
-            center_dist = self.center.distance(other.center)
+            center_dist = self.center.distance_to(other.center)
             return max(0, center_dist - self.radius - other.radius)
         elif isinstance(other, Line):
             return other.distance_to(self)
         elif isinstance(other, Rectangle):
-            return max(0, self.center.distance_to(other) - self.radius)
+            x_dist = max(0, other.p1.x - self.center.x, self.center.x - other.p2.x)
+            y_dist = max(0, other.p1.y - self.center.y, self.center.y - other.p3.y)
+            return max(0, math.hypot(x_dist, y_dist) - self.radius)
         else:
             raise ValueError("Unsupported shape combination for distance calculation.")
 
     def __repr__(self):
         return f"{self.name}[Center: {self.center}, Radius: {self.radius}]"
 
+
 class Rectangle:
-    def __init__(self, name, bottom_left, top_right):
-        if not (isinstance(bottom_left, Point) and isinstance(top_right, Point)):
-            raise ValueError("Rectangle must be defined by two Points.")
+    def __init__(self, name, p1, p2, p3, p4):
+        if not all(isinstance(p, Point) for p in [p1, p2, p3, p4]):
+            raise ValueError("Rectangle must be defined by four Points.")
         self.name = name
-        self.bottom_left = bottom_left
-        self.top_right = top_right
+        self.p1 = p1
+        self.p2 = p2
+        self.p3 = p3
+        self.p4 = p4
 
     def area(self):
-        width = abs(self.top_right.x - self.bottom_left.x)
-        height = abs(self.top_right.y - self.bottom_left.y)
-        return width * height
+        return 0.5 * abs(
+            self.p1.x * self.p2.y + self.p2.x * self.p3.y + self.p3.x * self.p4.y + self.p4.x * self.p1.y -
+            (self.p2.x * self.p1.y + self.p3.x * self.p2.y + self.p4.x * self.p3.y + self.p1.x * self.p4.y)
+        )
 
     def perimeter(self):
-        width = abs(self.top_right.x - self.bottom_left.x)
-        height = abs(self.top_right.y - self.bottom_left.y)
-        return 2 * (width + height)
+        return (
+            self.p1.distance_to(self.p2)
+            + self.p2.distance_to(self.p3)
+            + self.p3.distance_to(self.p4)
+            + self.p4.distance_to(self.p1)
+        )
 
     def distance_to(self, other):
         if isinstance(other, Point):
-            return other.distance_to(self)
+            edges = [(self.p1, self.p2), (self.p2, self.p3), (self.p3, self.p4), (self.p4, self.p1)]
+            return min(other.distance_to(Line("", edge[0], edge[1])) for edge in edges)
         elif isinstance(other, Circle):
-            return other.distance_to(self)
-        elif isinstance(other, Line):
-            return min(other.p1.distance_to(self), other.p2.distance_to(self))
+            edges = [(self.p1, self.p2), (self.p2, self.p3), (self.p3, self.p4), (self.p4, self.p1)]
+            return max(0, min(other.center.distance_to(Line("", edge[0], edge[1])) for edge in edges) - other.radius)
         elif isinstance(other, Rectangle):
-            x_dist = max(0, other.bottom_left.x - self.top_right.x, self.bottom_left.x - other.top_right.x)
-            y_dist = max(0, other.bottom_left.y - self.top_right.y, self.bottom_left.y - other.top_right.y)
-            return math.hypot(x_dist, y_dist)
+            edges_self = [(self.p1, self.p2), (self.p2, self.p3), (self.p3, self.p4), (self.p4, self.p1)]
+            edges_other = [(other.p1, other.p2), (other.p2, other.p3), (other.p3, other.p4), (other.p4, other.p1)]
+            return min(Line("", edge1[0], edge1[1]).distance_to(Line("", edge2[0], edge2[1]))
+                       for edge1 in edges_self for edge2 in edges_other)
         else:
             raise ValueError("Unsupported shape combination for distance calculation.")
 
     def __repr__(self):
-        return f"{self.name}[{self.bottom_left}, {self.top_right}]"
+        return f"{self.name}[{self.p1}, {self.p2}, {self.p3}, {self.p4}]"

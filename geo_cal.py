@@ -1,6 +1,6 @@
 import math
 
-# Classes for shapes
+#Classes for shapes
 class Point:
     def __init__(self, name, x, y):
         self.name = name
@@ -67,156 +67,84 @@ class Rectangle:
     def __repr__(self):
         return f"{self.name}[{self.bottom_left}, {self.top_right}]"
 
-#To input a point
-def input_point():
-    name = input("Enter name for the point: ").strip()
-    x = float(input(f"Enter x-coordinate for point {name}: "))
-    y = float(input(f"Enter y-coordinate for point {name}: "))
-    return Point(name, x, y)
-
-def input_line(points):
-    name = input("Enter name for the line: ").strip()
-    p1_name = input("Enter the name of the first point of the line: ").strip()
-    p2_name = input("Enter the name of the second point of the line: ").strip()
-    if p1_name in points and p2_name in points:
-        return Line(name, points[p1_name], points[p2_name])
-    else:
-        print("One or both points not found.")
-        return None
-
-def input_circle():
-    name = input("Enter name for the circle: ").strip()
-    center_name = input("Enter name for the center point of the circle: ").strip()
-    x = float(input(f"Enter x-coordinate for point {center_name}: "))
-    y = float(input(f"Enter y-coordinate for point {center_name}: "))
-    radius = float(input("Enter the radius of the circle: "))
-    center = Point(center_name, x, y)
-    return Circle(name, center, radius)
-
-def input_rectangle(points):
-    name = input("Enter name for the rectangle: ").strip()
-    bl_name = input("Enter the name of the bottom-left point of the rectangle: ").strip()
-    tr_name = input("Enter the name of the top-right point of the rectangle: ").strip()
-    if bl_name in points and tr_name in points:
-        return Rectangle(name, points[bl_name], points[tr_name])
-    else:
-        print("One or both points not found.")
-        return None
-
+# Main REPL-based geometric calculator
 def geometric_calculator():
-    points = {}
     shapes = {}
-    print("Welcome to the Geometric Calculator!")
 
-    # Input shapes
-    while True:
-        print("\nWhat shape would you like to input?")
-        print("1. Point")
-        print("2. Line")
-        print("3. Circle")
-        print("4. Rectangle")
-        print("5. Done entering shapes")
-        choice = input("Enter your choice (1-5): ").strip()
-        if choice == '1':
-            point = input_point()
-            points[point.name] = point
-            print(f"Point {point} recorded.")
-        elif choice == '2':
-            if len(points) < 2:
-                print("You need at least two points to define a line.")
-                continue
-            line = input_line(points)
-            if line:
-                shapes[line.name] = line
-                print(f"Line {line} recorded.")
-        elif choice == '3':
-            circle = input_circle()
-            shapes[circle.name] = circle
-            print(f"Circle {circle} recorded.")
-        elif choice == '4':
-            if len(points) < 2:
-                print("You need at least two points to define a rectangle.")
-                continue
-            rectangle = input_rectangle(points)
-            if rectangle:
-                shapes[rectangle.name] = rectangle
-                print(f"Rectangle {rectangle} recorded.")
-        elif choice == '5':
-            break
-        else:
-            print("Invalid choice. Please enter a number from 1 to 5.")
+    print("Geomteric Claculator")
+    print("For commands to create and calculate shapes type: help, to exit type:exit")
 
     while True:
-        print("\nWhat would you like to do?")
-        print("1. Calculate distance between two points")
-        print("2. Calculate length of a line")
-        print("3. Calculate area of a shape")
-        print("4. Calculate perimeter/circumference of a shape")
-        print("5. Exit")
-        action = input("Enter your choice (1-5): ").strip()
-        if action == '1':
-            if len(points) < 2:
-                print("Not enough points to calculate distance.")
+        try:
+            command = input("> ").strip()
+            if command.lower() == "exit":
+                print("Exiting the calculator. Goodbye!")
+                break
+            if command.lower() == "help":
+                print("\nCommands:")
+                print("Define a Point: <name> = Point(x, y)")
+                print("Define a Line: <name> = Line(point1, point2)")
+                print("Define a Circle: <name> = Circle(center, radius)")
+                print("Define a Rectangle: <name> = Rectangle(bottom_left, top_right)")
+                print("Query Distance: point1.distance(point2)")
+                print("Query Length: line.length()")
+                print("Query Area: shape.area()")
+                print("Query Perimeter/Circumference: shape.perimeter() or shape.circumference()")
+                print("List all defined shapes and points: list")
+                print("Type 'exit' to quit.\n")
                 continue
-            p1_name = input("Enter the name of the first point: ").strip()
-            p2_name = input("Enter the name of the second point: ").strip()
-            if p1_name in points and p2_name in points:
-                distance = points[p1_name].distance(points[p2_name])
-                print(f"Distance between {p1_name} and {p2_name} is {distance}")
-            else:
-                print("One or both points not found.")
-        elif action == '2':
-            if not any(isinstance(s, Line) for s in shapes.values()):
-                print("No lines available to calculate length.")
-                continue
-            line_name = input("Enter the name of the line: ").strip()
-            if line_name in shapes and isinstance(shapes[line_name], Line):
-                length = shapes[line_name].length()
-                print(f"Length of line {line_name} is {length}")
-            else:
-                print("Line not found.")
-        elif action == '3':
-            if not shapes:
-                print("No shapes available to calculate area.")
-                continue
-            shape_name = input("Enter the name of the shape: ").strip()
-            if shape_name in shapes:
-                shape = shapes[shape_name]
-                if isinstance(shape, Circle):
-                    area = shape.area()
-                    print(f"Area of circle {shape_name} is {area}")
-                elif isinstance(shape, Rectangle):
-                    area = shape.area()
-                    print(f"Area of rectangle {shape_name} is {area}")
+
+            if command.lower() == "list":
+                if not shapes:
+                    print("No shapes or points defined yet.")
                 else:
-                    print("Area calculation not supported for this shape.")
-            else:
-                print("Shape not found.")
-        elif action == '4':
-            if not shapes:
-                print("No shapes available to calculate perimeter/circumference.")
+                    print("Defined shapes and points:")
+                    for name, shape in shapes.items():
+                        print(f"- {name}: {shape}")
                 continue
-            shape_name = input("Enter the name of the shape: ").strip()
-            if shape_name in shapes:
-                shape = shapes[shape_name]
-                if isinstance(shape, Circle):
-                    circumference = shape.circumference()
-                    print(f"Circumference of circle {shape_name} is {circumference}")
-                elif isinstance(shape, Rectangle):
-                    perimeter = shape.perimeter()
-                    print(f"Perimeter of rectangle {shape_name} is {perimeter}")
-                elif isinstance(shape, Line):
-                    length = shape.length()
-                    print(f"Length of line {shape_name} is {length}")
+
+            #Commands handling
+            if "=" in command:
+                name, expr = command.split("=")
+                name = name.strip()
+                expr = expr.strip()
+
+                if expr.startswith("Point"):
+                    x, y = eval(expr[6:-1])
+                    shapes[name] = Point(name, x, y)
+                    print(f"{name} defined as {shapes[name]}.")
+
+                elif expr.startswith("Line"):
+                    p1_name, p2_name = expr[5:-1].split(",")
+                    p1 = shapes[p1_name.strip()]
+                    p2 = shapes[p2_name.strip()]
+                    shapes[name] = Line(name, p1, p2)
+                    print(f"{name} defined as {shapes[name]}.")
+
+                elif expr.startswith("Circle"):
+                    center_name, radius = expr[7:-1].split(",")
+                    center = shapes[center_name.strip()]
+                    radius = float(radius.strip())
+                    shapes[name] = Circle(name, center, radius)
+                    print(f"{name} defined as {shapes[name]}.")
+
+                elif expr.startswith("Rectangle"):
+                    bl_name, tr_name = expr[10:-1].split(",")
+                    bottom_left = shapes[bl_name.strip()]
+                    top_right = shapes[tr_name.strip()]
+                    shapes[name] = Rectangle(name, bottom_left, top_right)
+                    print(f"{name} defined as {shapes[name]}.")
+
                 else:
-                    print("Perimeter calculation not supported for this shape.")
+                    print("Invalid shape definition. Type 'help' for guidance.")
+
             else:
-                print("Shape not found.")
-        elif action == '5':
-            print("Exiting the calculator. Goodbye!")
-            break
-        else:
-            print("Invalid choice. Please enter a number from 1 to 5.")
+                #Query Evaluation
+                result = eval(command, {}, shapes)
+                print(result)
+
+        except Exception as e:
+            print(f"Error: {e}. Type 'help' for guidance.")
 
 if __name__ == "__main__":
     geometric_calculator()

@@ -27,20 +27,23 @@ def define_rectangle(name, expr, shapes):
     return f"{name} defined as {shapes[name]}."
 
 def parse_command(command, shapes):
-    name, expr = command.split("=")
-    name = name.strip()
-    expr = expr.strip()
+    if "=" in command:
+        name, expr = command.split("=")
+        name = name.strip()
+        expr = expr.strip()
 
-    if expr.startswith("Point"):
-        return define_point(name, expr, shapes)
-    elif expr.startswith("Line"):
-        return define_line(name, expr, shapes)
-    elif expr.startswith("Circle"):
-        return define_circle(name, expr, shapes)
-    elif expr.startswith("Rectangle"):
-        return define_rectangle(name, expr, shapes)
+        if expr.startswith("Point"):
+            return define_point(name, expr, shapes)
+        elif expr.startswith("Line"):
+            return define_line(name, expr, shapes)
+        elif expr.startswith("Circle"):
+            return define_circle(name, expr, shapes)
+        elif expr.startswith("Rectangle"):
+            return define_rectangle(name, expr, shapes)
+        else:
+            return "Invalid shape definition. Type 'help' for guidance."
     else:
-        return "Invalid shape definition. Type 'help' for guidance."
+        return "Unknown command. Type 'help' for guidance."
 
 def calculate_distance(shape1_name, shape2_name, shapes):
     if shape1_name not in shapes or shape2_name not in shapes:

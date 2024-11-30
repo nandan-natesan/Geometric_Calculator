@@ -61,6 +61,8 @@ class Line:
             if self.is_parallel_to(other):
                 return abs((other.p2.y - other.p1.y) * self.p1.x - (other.p2.x - other.p1.x) * self.p1.y +
                            other.p2.x * other.p1.y - other.p2.y * other.p1.x) / other.length()
+            elif self.p1.distance_to(other.p1) == 0 and self.p2.distance_to(other.p2) == 0:
+                return 0  # Identical lines
             else:
                 return 0  # Intersecting lines
         else:
@@ -92,7 +94,7 @@ class Circle:
         elif isinstance(other, Line):
             return other.distance_to(self)
         elif isinstance(other, Rectangle):
-            return self.center.distance_to(other) - self.radius
+            return max(0, self.center.distance_to(other) - self.radius)
         else:
             raise ValueError("Unsupported shape combination for distance calculation.")
 

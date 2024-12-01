@@ -61,7 +61,6 @@ def process_query(command, shapes):
                 for name, shape in shapes.items():
                     print(f"- {name}: {shape}")
         else:
-            # Evaluate the query using the shapes context
             result = eval(command, {}, shapes)
             print(result)
     except Exception as e:

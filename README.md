@@ -2,8 +2,9 @@
 
 ## Command to Run the Code
 
-1. Open the terminal and navigate to the folder containing the project files.
-2. Run the application using:
+1. Unzip all the 3 files, in the same file directory
+2. Open the terminal and navigate to the folder containing the project files.
+3. Run the application using, to get the CLI like interface:
 
    ```bash
    python3 main.py
@@ -48,7 +49,7 @@
   ```python
   distance(p1, l1)
 
-- Use the `help` command within the application to view the list of available commands.
+- Use the `help` command after running the program to view the list of available commands.
 
 ---
 
@@ -69,6 +70,7 @@ The **Geometric Calculator** is a command-line interface tool implemented using 
 
 - **Main Program Loop**:
   - The main program (`main.py`) provides a REPL-like interface to continuously accept user commands until the `exit` command is entered.
+
 ## Assumptions and Known Issues with the Implementation
 
 ### Assumptions
@@ -76,6 +78,7 @@ The **Geometric Calculator** is a command-line interface tool implemented using 
 - All shapes are defined in a **2D Cartesian coordinate system**.
 - If two shapes intersect, the distance between them is **0.0**.
 - All user inputs must follow the correct syntax for shape definitions and queries.
+- Names of all variables must have no space between them
 
 ---
 
@@ -83,7 +86,7 @@ The **Geometric Calculator** is a command-line interface tool implemented using 
 
 - **Rotated Rectangles**:
   - Rotated rectangles are supported, but calculations may fail if points are not input correctly to form a valid rectangle.
-  - The same applies for all inputs; improper definitions may lead to errors.
+  - The same applies for all inputs; improper definitions may lead to errors, as it does not check for validity of shape.
 
 ## Challenges Faced During the Project
 
@@ -118,7 +121,7 @@ The **Geometric Calculator** is a command-line interface tool implemented using 
 
 ### Quality of Life Addition
 
-- A `list` command was added to allow users to view all defined shapes, making it easier to track progress in the session.
+- A `list` command was added to allow the user to view all defined shapes, making it easier to track progress in the session.
 
 ---
 

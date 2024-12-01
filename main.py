@@ -4,20 +4,20 @@ def geometric_calculator():
     shapes = {}
 
     print("Geometric Calculator")
-    print("For queries to create and calculate shapes type: help, to exit type: exit")
+    print("For queries to create and calculate shapes type: help, to quit type: exit")
 
     while True:
         try:
             command = input("> ").strip()
             if command.lower() == "exit":
-                print("Exiting the calculator. Goodbye!")
+                print("Exit success")
                 break
             elif command.lower() == "help":
                 print("\nCommands:")
                 print("Define a Point: <name> = Point(x, y)")
-                print("Define a Line: <name> = Line(point1, point2)")
-                print("Define a Circle: <name> = Circle(center, radius)")
-                print("Define a Rectangle: <name> = Rectangle(point1, point2, point3, point4)")
+                print("Define a Line: <name> = Line(point1, point2){use predefined points only}")
+                print("Define a Circle: <name> = Circle(center, radius){use predefined points only}")
+                print("Define a Rectangle: <name> = Rectangle(point1, point2, point3, point4){use predefined points only}")
                 print("Query Distance: distance(shape1, shape2)")
                 print("Query Area of Circle/Rectangle: <shape>.area()")
                 print("Query Perimeter of Rectangle: <shape>.perimeter()")

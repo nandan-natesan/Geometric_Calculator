@@ -9,6 +9,10 @@
    ```bash
    python3 main.py
 
+- Link to public github repository on my github account of the same: https://github.com/nandan-natesan/Geometric_Calculator
+
+- Note: The `feature/inline-point-definition` branch was created to test the most complicated function of distance between various shapes along with other features, while the main branch had initial working functionality. Later, once the error free implementation for the same was completed, it was merged with the `main` branch.
+
 ---
 
 ## Functions and Syntax
